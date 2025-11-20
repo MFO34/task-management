@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import projectService from '../services/projectService';
 import taskService from '../services/taskService';
 import statsService from '../services/statsService';
+import CreateTaskModal from '../components/tasks/CreateTaskModal';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -32,6 +33,7 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
 
   // Load project data
   useEffect(() => {
@@ -57,6 +59,15 @@ const ProjectDetail = () => {
       setError('Failed to load project details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateTask = async (taskData) => {
+    try {
+      await taskService.createTask(projectId, taskData);
+      await loadProjectData(); // Reload data
+    } catch (err) {
+      throw new Error(err.response?.data?.error || 'Failed to create task');
     }
   };
 
@@ -247,26 +258,26 @@ const ProjectDetail = () => {
                     <h2 className="text-xl font-semibold text-gray-900">
                       Tasks ({tasks.length})
                     </h2>
-                    <Link
-                      to={`/projects/${projectId}/tasks/new`}
+                    <button
+                      onClick={() => setIsCreateTaskModalOpen(true)}
                       className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                       <FiPlus className="mr-2" />
                       New Task
-                    </Link>
+                    </button>
                   </div>
 
                   {tasks.length === 0 ? (
                     <div className="text-center py-12">
                       <FiCheckSquare className="mx-auto h-12 w-12 text-gray-400" />
                       <p className="mt-2 text-sm text-gray-600">No tasks yet</p>
-                      <Link
-                        to={`/projects/${projectId}/tasks/new`}
+                      <button
+                        onClick={() => setIsCreateTaskModalOpen(true)}
                         className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       >
                         <FiPlus className="mr-2" />
                         Create First Task
-                      </Link>
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -358,6 +369,13 @@ const ProjectDetail = () => {
         onClose={() => setIsAddMemberModalOpen(false)}
         onSubmit={handleAddMember}
         existingMemberIds={members.map((m) => m.userId)}
+      />
+
+      <CreateTaskModal
+        isOpen={isCreateTaskModalOpen}
+        onClose={() => setIsCreateTaskModalOpen(false)}
+        onSubmit={handleCreateTask}
+        projectMembers={members}
       />
     </>
   );

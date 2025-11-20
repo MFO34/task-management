@@ -8,16 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
-
-// Temporary Tasks component
-const Tasks = () => (
-  <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-      <p className="mt-4 text-gray-600">Tasks page coming soon...</p>
-    </div>
-  </div>
-);
+import MyTasks from './pages/MyTasks';
 
 function App() {
   return (
@@ -60,7 +51,7 @@ function App() {
             path="/tasks"
             element={
               <ProtectedRoute>
-                <Tasks />
+                <MyTasks />
               </ProtectedRoute>
             }
           />
