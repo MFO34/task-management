@@ -1,4 +1,4 @@
-import { FiUser, FiUserX, FiCrown } from 'react-icons/fi';
+import { FiUser, FiUserX, FiStar } from 'react-icons/fi';
 
 const MemberList = ({ members, projectOwner, onRemoveMember, currentUserId }) => {
   const isOwner = projectOwner?.id === currentUserId;
@@ -37,7 +37,7 @@ const MemberList = ({ members, projectOwner, onRemoveMember, currentUserId }) =>
                       )}
                     </p>
                     {isMemberOwner && (
-                      <FiCrown className="w-4 h-4 text-yellow-500" title="Project Owner" />
+                      <FiStar className="w-4 h-4 text-yellow-500" title="Project Owner" />
                     )}
                   </div>
                   <p className="text-xs text-gray-500">{member.email}</p>
