@@ -20,6 +20,7 @@ import projectService from '../services/projectService';
 import taskService from '../services/taskService';
 import statsService from '../services/statsService';
 import CreateTaskModal from '../components/tasks/CreateTaskModal';
+import EditTaskModal from '../components/tasks/EditTaskModal';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -34,6 +35,8 @@ const ProjectDetail = () => {
   const [error, setError] = useState('');
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
 
   // Load project data
   useEffect(() => {
@@ -103,6 +106,29 @@ const ProjectDetail = () => {
       navigate('/projects');
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to delete project');
+    }
+  };
+
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleUpdateTask = async (taskData) => {
+    try {
+      await taskService.updateTask(selectedTask.id, taskData);
+      await loadProjectData();
+    } catch (err) {
+      throw new Error(err.response?.data?.error || 'Failed to update task');
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    try {
+      await taskService.deleteTask(selectedTask.id);
+      await loadProjectData();
+    } catch (err) {
+      throw new Error(err.response?.data?.error || 'Failed to delete task');
     }
   };
 
@@ -282,7 +308,7 @@ const ProjectDetail = () => {
                   ) : (
                     <div className="space-y-3">
                       {tasks.slice(0, 5).map((task) => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} onClick={handleTaskClick}  />
                       ))}
                       
                       {tasks.length > 5 && (
@@ -375,6 +401,16 @@ const ProjectDetail = () => {
         isOpen={isCreateTaskModalOpen}
         onClose={() => setIsCreateTaskModalOpen(false)}
         onSubmit={handleCreateTask}
+        projectMembers={members}
+      />
+
+      {/* Edit Task Modal */}
+      <EditTaskModal
+        isOpen={isEditTaskModalOpen}
+        onClose={() => setIsEditTaskModalOpen(false)}
+        onSubmit={handleUpdateTask}
+        onDelete={handleDeleteTask}
+        task={selectedTask}
         projectMembers={members}
       />
     </>
